@@ -1,6 +1,6 @@
-The MSVAR MSN-Burr model extends the traditional Markov Switching Vector Autoregressive (MSVAR) framework by incorporating the Modified Skew Normal Burr distribution to better capture asymmetric and heavy-tailed characteristics in multivariate time series data. This makes it particularly useful for modeling complex dynamic systems where standard Gaussian assumptions are insufficient.
+The MSVAR MSN-Burr model extends the traditional Markov Switching Vector Autoregressive (MSVAR) framework by incorporating the Modified Skew Normal Burr distribution to better capture asymmetric and heavy-tailed characteristics in multivariate time series data. This makes it particularly useful for modeling complex dynamic systems with insufficient standard Gaussian assumptions.
 
-Key Features
+##Key Features
 Robust to non-normality: Handles skewness and heavy tails in data effectively.
 
 Regime switching: Models multiple latent states with dynamic transitions.
