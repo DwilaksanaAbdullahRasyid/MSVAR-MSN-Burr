@@ -11,6 +11,7 @@ The MSVAR MSN-Burr model extends the traditional Markov Switching Vector Autoreg
 - Bayesian estimation: Utilizes advanced sampling techniques such as No-U-Turn Sampler (NUTS) for parameter inference.
 
 **Applications**
+
 The MSVAR MSN-Burr model is particularly suited for:
 
 - Financial time series analysis with regime changes and asymmetric shocks.
@@ -20,6 +21,7 @@ The MSVAR MSN-Burr model is particularly suited for:
 - Environmental and economic data exhibiting nonlinear dynamics and structural breaks.
 
 **Repository Contents**
+
 Implementation scripts in Stan and R for model estimation and simulation.
 
 - Example datasets and simulation scenarios.
@@ -29,6 +31,7 @@ Implementation scripts in Stan and R for model estimation and simulation.
 - Visualization tools for posterior analysis, regime classification, and forecast evaluation.
 
 **Getting Started**
+
 1. To run the MSVAR MSN-Burr model:
 
 2. Install required software: R, Stan, and dependencies.
