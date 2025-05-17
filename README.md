@@ -1,41 +1,42 @@
 The MSVAR MSN-Burr model extends the traditional Markov Switching Vector Autoregressive (MSVAR) framework by incorporating the Modified Skew Normal Burr distribution to better capture asymmetric and heavy-tailed characteristics in multivariate time series data. This makes it particularly useful for modeling complex dynamic systems with insufficient standard Gaussian assumptions.
 
-##Key Features
-Robust to non-normality: Handles skewness and heavy tails in data effectively.
+**Key Features**
 
-Regime switching: Models multiple latent states with dynamic transitions.
+- Robust to non-normality: Handles skewness and heavy tails in data effectively.
 
-Multivariate autoregression: Captures dependencies across multiple time series variables.
+- Regime switching: Models multiple latent states with dynamic transitions.
 
-Bayesian estimation: Utilizes advanced sampling techniques such as No-U-Turn Sampler (NUTS) for parameter inference.
+- Multivariate autoregression: Captures dependencies across multiple time series variables.
 
-Applications
+- Bayesian estimation: Utilizes advanced sampling techniques such as No-U-Turn Sampler (NUTS) for parameter inference.
+
+**Applications**
 The MSVAR MSN-Burr model is particularly suited for:
 
-Financial time series analysis with regime changes and asymmetric shocks.
+- Financial time series analysis with regime changes and asymmetric shocks.
 
-Biomedical signal processing, such as EEG data analysis for detecting seizure states.
+- Biomedical signal processing, such as EEG data analysis for detecting seizure states.
 
-Environmental and economic data exhibiting nonlinear dynamics and structural breaks.
+- Environmental and economic data exhibiting nonlinear dynamics and structural breaks.
 
-Repository Contents
+**Repository Contents**
 Implementation scripts in Stan and R for model estimation and simulation.
 
-Example datasets and simulation scenarios.
+- Example datasets and simulation scenarios.
 
-Detailed documentation on model specification, estimation procedures, and diagnostics.
+- Detailed documentation on model specification, estimation procedures, and diagnostics.
 
-Visualization tools for posterior analysis, regime classification, and forecast evaluation.
+- Visualization tools for posterior analysis, regime classification, and forecast evaluation.
 
-Getting Started
-To run the MSVAR MSN-Burr model:
+**Getting Started**
+1. To run the MSVAR MSN-Burr model:
 
-Install required software: R, Stan, and dependencies.
+2. Install required software: R, Stan, and dependencies.
 
-Load example data or provide your own multivariate time series.
+3. Load example data or provide your multivariate time series.
 
-Configure model parameters and priors as needed.
+4. Configure model parameters and priors as needed.
 
-Run the estimation script using NUTS sampler.
+5. Run the estimation script using the NUTS sampler.
 
-Analyze outputs including posterior distributions, regime probabilities, and forecast accuracy.
+6. Analyze outputs including posterior distributions, regime probabilities, and forecast accuracy.
