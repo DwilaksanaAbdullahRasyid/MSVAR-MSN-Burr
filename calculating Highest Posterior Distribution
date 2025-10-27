@@ -1,0 +1,37 @@
+#HPD REGIME1
+#==========================
+hpd90=emp.hpd(ccc$data_MA_PM10[ccc$regime_converge==1], conf=0.9)
+hpd95=emp.hpd(ccc$data_MA_PM10[ccc$regime_converge==1], conf=0.95)
+hpd99=emp.hpd(ccc$data_MA_PM10[ccc$regime_converge==1], conf=0.99)
+hist(ccc$data_MA_PM10[ccc$regime_converge==1],xlab="PM10",ylab="Frequency",breaks=23, prob=TRUE)
+#lines(density(tmpp))
+abline(v = hpd90[1], col = "red", lty = 2, lwd = 2)
+abline(v = hpd90[2], col = "red", lty = 2, lwd = 2)
+abline(v = hpd95[1], col = "green", lty = 2, lwd = 2)
+abline(v = hpd95[2], col = "green", lty = 2, lwd = 2)
+abline(v = hpd99[1], col = "blue", lty = 2, lwd = 2)
+abline(v = hpd99[2], col = "blue", lty = 2, lwd = 2)
+
+#HPD REGIME2
+#==========================
+hpd90=emp.hpd(ccc$data_MA_PM10[ccc$regime_converge==2], conf=0.9)
+hpd95=emp.hpd(ccc$data_MA_PM10[ccc$regime_converge==2], conf=0.95)
+hpd99=emp.hpd(ccc$data_MA_PM10[ccc$regime_converge==2], conf=0.99)
+hist(ccc$data_MA_PM10[ccc$regime_converge==2],xlab="PM10",ylab="Frequency",breaks=23, prob=TRUE)
+#lines(density(tmpp))
+abline(v = hpd90[1], col = "red", lty = 2, lwd = 2)
+abline(v = hpd90[2], col = "red", lty = 2, lwd = 2)
+abline(v = hpd95[1], col = "green", lty = 2, lwd = 2)
+abline(v = hpd95[2], col = "green", lty = 2, lwd = 2)
+abline(v = hpd99[1], col = "blue", lty = 2, lwd = 2)
+abline(v = hpd99[2], col = "blue", lty = 2, lwd = 2)
+
+# overlay histogram, empirical density and normal density
+p0 = qplot(x, geom = 'blank') +   
+  geom_line(aes(y = ..density.., colour = 'Empirical'), stat = 'density') +  
+  stat_function(fun = dnorm, aes(colour = 'Normal')) +                       
+  geom_histogram(aes(y = ..density..), alpha = 0.4) +                        
+  scale_colour_manual(name = 'Density', values = c('red', 'blue')) + 
+  theme(legend.position = c(0.85, 0.85))
+
+print(p0)
