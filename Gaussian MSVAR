@@ -1,3 +1,36 @@
+library(rstan)
+library(rstantools)
+library(ggplot2)
+library(StanHeaders)
+library(loo)
+library(tseries)
+library(MSwM)
+library(ggdist)
+library(gridExtra)
+library(ggExtra)
+library(TeachingDemos)
+library(openxlsx)
+library(imputeTS)
+
+# Generate 100 observations from a normal distribution for two variables
+T <- 1000
+xx <- rnorm(T, mean = 5, sd = 2)  # Adjust mean and sd as needed
+yy <- rnorm(T, mean = 10, sd = 3)
+x_data = read.table("D:\\....txt",header = TRUE,sep=" ")
+y_data = read.table("D:\\....txt",header = TRUE,sep=" ")
+x <- as.numeric(x_data$no)  # Replace 'no' with your actual column name
+y <- as.numeric(y_data$no)
+
+# Prepare the data list for Stan
+data_list <- list(
+  T = T,
+  x <- x,
+  y <- y
+)
+# Verify their structure
+print(str(x))  # Should show 'num [1:T]'
+print(str(y))  # Should show 'num [1:T]'
+
 MSVAR_NORMAL <- '
 functions {
   real bivariate_normal(real x, real y, real mu_x, real sigma_x, real mu_y, real sigma_y) {
