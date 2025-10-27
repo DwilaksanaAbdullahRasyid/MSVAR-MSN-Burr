@@ -1,0 +1,62 @@
+#ARL(0) AND ARL(1) CALCULATIONS
+#============================
+data_frame <- read.csv("D:\\....csv",sep=";")
+regions <- data_frame$Region
+# Define control limits for each region
+control_limits <- list(
+  A = list(lower = 4, upper = 11), # Region A control limits
+  B = list(lower = 8.8750, upper = 36)  # Region B control limits
+)
+# Function to calculate ARL
+calculate_arl <- function(data, lower, upper) {
+  run_lengths <- c()  # Store lengths of each run
+  current_run <- 0     # Track the current run length
+  
+  for (val in data) {
+    if (val >= lower & val <= upper) {
+      # In control: continue the current run
+      current_run <- current_run + 1
+    } else {
+      # Out of control: end the current run
+      if (current_run > 0) {
+        run_lengths <- c(run_lengths, current_run)
+        current_run <- 0
+      }
+    }
+  }
+  # Add the last run if it ended in control
+  if (current_run > 0) {
+    run_lengths <- c(run_lengths, current_run)
+  }
+  
+  # Return the average run length
+  if (length(run_lengths) == 0) {
+    return(0)  # No runs found
+  } else {
+    return(mean(run_lengths))
+  }
+}
+# Initialize results for ARL(0) and ARL(1)
+results <- data.frame(Region = c("A", "B"), ARL0 = NA, ARL1 = NA)
+
+# Loop through each region to calculate ARL(0) and ARL(1)
+for (region in c("A", "B")) {
+  # Filter data for the current region
+  region_data <- data_frame[data_frame$Region == region, ]$data_MA_PM10
+  
+  # Retrieve control limits for the region
+  limits <- control_limits[[region]]
+  
+  # Calculate ARL(0) and ARL(1) directly
+  arl0 <- calculate_arl(region_data, limits$lower, limits$upper) # In-control ARL
+  arl1 <- calculate_arl(region_data, -Inf, limits$lower - 0.001) + # Below LCL
+    calculate_arl(region_data, limits$upper + 0.001, Inf)   # Above UCL
+  
+  # Store results
+  results[results$Region == region, ] <- c(region, arl0, arl1)
+}
+
+# Print results
+print(results)
+
+
