@@ -1,0 +1,124 @@
+MSVAR_NORMAL <- '
+functions {
+  real bivariate_normal(real x, real y, real mu_x, real sigma_x, real mu_y, real sigma_y) {
+    // Check constraints: sigma_x, sigma_y > 0
+    if (sigma_x <= 0 || sigma_y <= 0) {
+      reject("Invalid parameters: sigma_x and sigma_y must be > 0");
+    }
+    
+    // Univariate normal log-densities for x and y
+    real log_density_x = -0.5 * log(2 * pi()) - log(sigma_x) - 0.5 * ((x - mu_x) / sigma_x)^2;
+    real log_density_y = -0.5 * log(2 * pi()) - log(sigma_y) - 0.5 * ((y - mu_y) / sigma_y)^2;
+    
+    // Sum of independent log-densities for bivariate normal
+    return log_density_x + log_density_y;
+  }
+}
+
+data {
+  int T;
+  vector[T] x; // Independent variable x
+  vector[T] y; // Independent variable y
+}
+
+parameters {
+  vector<lower = 0, upper = 0.95>[2] p;
+  vector<lower=0>[2] sigma_x;
+  vector<lower=0>[2] sigma_y;
+  vector[2] beta_0_x;
+  vector[2] beta_0_y;
+  real <lower=0, upper=0.97> beta_11_x;
+  real <lower=0, upper=0.98> beta_12_x;
+  real <lower=0, upper=0.93> beta_11_y;
+  real <lower=0, upper=0.98> beta_12_y;
+  real <lower=0, upper=1> xi1_init;
+  real x_tm1_init;
+  real y_tm1_init;
+  real x_tm2_init;
+  real y_tm2_init;
+}
+
+transformed parameters {
+  matrix[T, 2] eta;
+  matrix[T, 2] xi;
+  vector[T] f;
+  vector[T] regime;
+  
+  for (t in 1:T) {
+    if (t == 1) {
+      eta[t, 1] = exp(bivariate_normal(x[t], y[t], beta_0_x[1] + beta_11_x * x_tm1_init, sigma_x[1],  beta_0_y[1] + beta_11_y * y_tm1_init, sigma_y[1]));
+      eta[t, 2] = exp(bivariate_normal(x[t], y[t], beta_0_x[2] + beta_12_x * x_tm2_init, sigma_x[2],  beta_0_y[2] + beta_12_y * y_tm2_init, sigma_y[2]));
+    } else {
+      eta[t, 1] = exp(bivariate_normal(x[t], y[t], beta_0_x[1] + beta_11_x * x[t - 1], sigma_x[1], beta_0_y[1] + beta_11_y * y[t - 1], sigma_y[1]));
+      eta[t, 2] = exp(bivariate_normal(x[t], y[t], beta_0_x[2] + beta_12_x * x[t - 1], sigma_x[2], beta_0_y[2] + beta_12_y * y[t - 1], sigma_y[2]));
+    }
+  }
+  // Calculate transition probabilities for xi and f
+  for (t in 1:T) {
+    if (t == 1) {
+      f[t] = p[1] * xi1_init * eta[t, 1] + (1 - p[1]) * xi1_init * eta[t, 2] + p[2] * (1 - xi1_init) * eta[t, 2] + (1 - p[2]) * (1 - xi1_init) * eta[t, 1];
+      xi[t, 1] = (p[1] * xi1_init * eta[t, 1] + (1 - p[2]) * (1 - xi1_init) * eta[t, 1]) / f[t];
+      xi[t, 2] = 1.0 - xi[t, 1];
+    } else {
+      f[t] = p[1] * xi[t - 1, 1] * eta[t, 1] + (1 - p[1]) * xi[t - 1, 1] * eta[t, 2] + p[2] * xi[t - 1, 2] * eta[t, 2] + (1 - p[2]) * xi[t - 1, 2] * eta[t, 1];
+      xi[t, 1] = (p[1] * xi[t - 1, 1] * eta[t, 1] + (1 - p[2]) * xi[t - 1, 2] * eta[t, 1]) / f[t];
+      xi[t, 2] = 1.0 - xi[t, 1];
+    }
+    regime[t] = (xi[t, 1] > xi[t, 2]) ? 1 : 2;
+  }
+}
+
+model {
+  // Priors
+  p ~ normal(0.7, 0.05);
+  beta_0_x ~ normal(0, 1);
+  beta_0_y ~ normal(0, 1);
+  beta_11_x ~ normal(0, 0.2);
+  beta_12_x ~ normal(0, 0.2);
+  beta_11_y ~ normal(0, 0.2);
+  beta_12_y ~ normal(0, 0.2);
+  sigma_x ~ normal(1, 0.5);
+  sigma_y ~ normal(1, 0.5);
+  xi1_init ~ beta(1, 2);
+  x_tm1_init ~ normal(1, 0.1);
+  y_tm1_init ~ normal(1, 0.1);
+  x_tm2_init ~ normal(1, 0.1);
+  y_tm2_init ~ normal(1, 0.1);
+  
+  // Likelihood calculation based on the combined densities in f
+  target += sum(log(f));
+}
+
+generated quantities {
+  vector[T] log_lik;       // Log-likelihood contributions
+  real log_lik_sum;        // Total log-likelihood
+  real log_lik_hat;        // Log-likelihood at posterior mean
+  real p_DIC;              // Effective number of parameters (p_DIC)
+  real DIC;                // Deviance Information Criterion
+  real AIC;                // Akaike Information Criterion
+  real BIC;                // Bayesian Information Criterion
+  
+  log_lik_sum = 0;
+  
+  // Compute log-likelihood contributions
+  for (t in 1:T) {
+    log_lik[t] = log(f[t]);
+    log_lik_sum += log_lik[t];
+  }
+  // Compute log-likelihood at the posterior mean (approximate as log_lik_sum)
+  log_lik_hat = log_lik_sum;
+  
+  // Effective number of parameters for DIC
+  p_DIC = 2 * (log_lik_hat - log_lik_sum);
+  
+  // Deviance Information Criterion
+  DIC = -2 * log_lik_hat + 2 * p_DIC;
+  
+  // Akaike Information Criterion
+  int k = 14; // Number of parameters in the model (adjust based on actual count)
+  AIC = -2 * log_lik_sum + 2 * k;
+  
+  // Bayesian Information Criterion
+  BIC = -2 * log_lik_sum + k * log(T);
+}
+'
